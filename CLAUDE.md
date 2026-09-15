@@ -22,7 +22,7 @@ falsifiable predictions. **E2 (an inverted-U shaped offload-rate curve across
 the acquisition curve) is explicitly called "the paper"** — the single most
 important thing to reproduce/test.
 
-## Current status: Phase 1, 2a/2b, 2c (PAMAP2), and Phase 3 (ASSISTments BKT fit) DONE — 3 real datasets now used
+## Current status: Phase 1, 2a/2b, 2c (PAMAP2), Phase 3 (ASSISTments BKT fit), and Phase 4 (ROSMA, RQ1 test) DONE — 4 real datasets now used
 
 All work lives in `simulation/`. Full details, how to reproduce every number,
 and file-to-proposal-section mapping are in **`simulation/README.md`** — read
@@ -155,6 +155,61 @@ knowledge, which only the field trial (Section 13) can actually measure. Do
 not "fix" this by re-tuning p_init back down — that would defeat the point
 of grounding it in real data.
 
+### Phase 4 — ROSMA (dataset #4: first real test of RQ1, psychomotor-skill mastery)
+`simulation/train_rosma_classifier.py` (+ `src/rosma_data.py`)
+
+JIGSAWS (surgical robot kinematics with real novice/intermediate/expert
+labels — the closest public domain match to the proposal) was submitted for
+access 2026-09-09 and **rejected** by 2026-09-15. ROSMA (da Vinci Research
+Kit kinematic data, Zenodo, no access request needed) was the documented
+backup (see the prior "Next steps / Phase 4" candidates list this section
+replaces). Zenodo had a multi-day outage through
+2026-09-09; retried 2026-09-15 and was back up, so the dataset (207 trial
+CSVs + scores.csv, ~1.6GB, videos skipped as unneeded) was downloaded into
+`simulation/data/ROSMA/`.
+
+ROSMA: 12 users, 3 maneuvers (Post-and-Sleeve, Pea-on-a-Peg, Wire-Chaser-I),
+6 repetitions each — a real, repeated psychomotor practice trajectory (time
+and error count visibly improve across repetitions), unlike any other
+dataset in this project. No per-trial novice/expert label exists, so
+repetitions 1-2 of each (user,task) sequence are labelled "early"
+(lower-mastery) and 5-6 "late" (higher-mastery); middle reps 3-4 are held
+out of binary training and used only for a monotonic-trend check. Features:
+whole-trial mean/std/min/max of all 154 numeric kinematic channels (4
+manipulators' position/orientation/velocity/wrench/joint data) = 616
+features/trial. One corrupted scores.csv row (`X11_Pea_on_a_Peg_01`, a
+~1000x decimal-point logging error) dropped.
+
+**Result — a genuine, documented negative/mixed finding, not a clean
+confirmation of RQ1**: on a 12-user 70/20/10 split (8 train/2 test/2
+validation users, `X05`/`X11` held out as test), the primary cross-user
+early-vs-late classifier scored **47.6% accuracy (n=21 test trials, chance =
+50%)** — does not beat chance — and was notably overconfident (82.0% mean
+confidence vs 47.6% accuracy, ECE=0.343). The predicted-mastery-probability
+vs repetition-number trend was not significant (Spearman rho=0.16, p=0.37).
+The §13.2 split-inflation check DID replicate a 4th time on this very
+different dataset (proper 47.6% vs improper random-split 58.5%, +10.9pp
+inflation) — though even the "inflated" number is barely above chance. An
+exploratory follow-up — normalizing each trial's features against its own
+(user, task) group's mean/std, to isolate within-person practice change from
+between-person baseline differences (body size, motion style, overall skill)
+— raised accuracy to 61.9%, consistent with (but not proof of, n=21) a
+person-identity-confound explanation for Check 1's failure. **Bottom line:
+RQ1 stays genuinely open** — this is the first real attempt at it, and it
+surfaced a specific, plausible reason for the null result plus one piece of
+suggestive counter-evidence, on a sample too small to settle the question
+either way. Do not report this as either "RQ1 confirmed" or "ROSMA doesn't
+work" — report it as open, with the person-identity-confound lead flagged
+for a supervisor discussion or a larger-N follow-up.
+
+Full writeup, results table, and honest interpretation:
+`simulation/README.md` Section 10. Outputs: `simulation/results/rosma_report.json`,
+`rosma_mastery_trend.png`, `rosma_reliability_diagram.png`. This track is
+standalone — it does NOT feed into `simulate.py`'s Phase 1 E1/E2/E3
+simulation (unlike datasets #1-3), since it answers a different question
+(is mastery recoverable from sensor data at all) rather than grounding a
+simulation parameter.
+
 ### Train/validation/test split (added after supervisor asked for ≥3 datasets)
 All 3 real-data pipelines now use a proper **70% train / 20% test / 10%
 validation** split, GROUP-disjoint (subject id for HAR/PAMAP2, student id for
@@ -181,88 +236,74 @@ cd simulation
 .\venv\Scripts\python.exe train_pamap2_classifier.py    # dataset #2 (PAMAP2) -> replication + pooled uncertainty CSV
 .\venv\Scripts\python.exe fit_bkt_assistments.py        # dataset #3 (ASSISTments) -> real BKT param ranges
 .\venv\Scripts\python.exe run_experiment.py             # Phase 1 simulation, grounded in all 3 datasets
+.\venv\Scripts\python.exe train_rosma_classifier.py     # dataset #4 (ROSMA) -> standalone RQ1 test, not part of run_experiment.py
 ```
-`run_experiment.py` alone actually runs the whole chain automatically if any
-of the three datasets' outputs are missing — the three lines above are only
-needed if you want to inspect one dataset's own printed numbers first.
-Outputs go to `simulation/results/` (CSVs, JSON prediction reports, 8 PNG charts).
-Raw dataset #2/#3 downloads are NOT small (~688MB PAMAP2 zip, ~83MB
-ASSISTments CSV) — see `simulation/README.md` Section 2 for the exact
-download commands if `simulation/data/` needs to be repopulated from scratch.
+`run_experiment.py` alone actually runs the whole datasets #1-3 chain
+automatically if any of those three outputs are missing — the first three
+lines above are only needed if you want to inspect one dataset's own
+printed numbers first. `train_rosma_classifier.py` (dataset #4) is separate
+and standalone (see Phase 4 above) — it is never auto-run by
+`run_experiment.py`, since it tests RQ1 directly rather than feeding a
+parameter into the Phase 1 simulation.
+Outputs go to `simulation/results/` (CSVs, JSON prediction reports, PNG charts).
+Raw dataset #2/#3/#4 downloads are NOT small (~688MB PAMAP2 zip, ~83MB
+ASSISTments CSV, ~1.6GB ROSMA kinematic CSVs) — see `simulation/README.md`
+Section 2 for the exact download commands if `simulation/data/` needs to be
+repopulated from scratch.
 
 ### Also done
-- `Weekly Report/Week6_Report.md` — Week 6 report for the supervisor, written
-  in English, covering everything above in report form.
+- `Weekly Report/Week6_Report.md`, `Weekly Report/Week7_Report.md`,
+  `Weekly Report/Week8_Report.md` — weekly reports for the supervisor,
+  written in English, covering the work above in report form.
+- `Weekly Report/Supervisor_Discussion_Notes_Phase4.md` — NOT a status
+  report; talking points for a live discussion with Ajay on the two open
+  design questions Phase 4 raised (ROSMA's person-identity-confound lead,
+  and whether the mastery-conditioned utility function should incorporate
+  calibrated uncertainty as a weighted input rather than only a gate). Read
+  this before making a unilateral call on either question.
 
-## Next steps / Phase 4 (not started yet)
+## Next steps / Phase 5 (not started yet)
 
-Phases 1-3 now validate the *perception pipeline* (twice, independently, on
-real IMU data) and the *BKT machinery* (on real learning data), but **no
-real psychomotor-skill/mastery-labelled dataset has been used yet** — none
-of UCI HAR, PAMAP2, or ASSISTments has skill/mastery labels on a motor-skill
-task, so RQ1 (can mastery be estimated from real sensor data, in this
-specific domain?) is still untested on real data. Candidates, in priority
-order:
+Phase 4 (see above) ran the first real test of RQ1 on ROSMA and got a
+genuinely mixed, open result — not a confirmation, not a refutation. JIGSAWS
+was rejected. Both of the two top-priority real-data candidates for RQ1 are
+now exhausted; what's left, in priority order:
 
-1. **JIGSAWS** (JHU-ISI Gesture and Skill Assessment Working Set) — surgical
-   robot kinematic data labelled novice/intermediate/expert. Closest public
-   match to this proposal's actual domain. **Access-request form submitted
-   2026-09-09, awaiting approval** (usually a few days). This is the natural
-   next real-data step for RQ1.
-
-   **Backup plan if JIGSAWS is rejected or doesn't respond in time**, in
-   priority order:
-   1. **ROSMA** (Robotic Surgical Maneuvers Dataset, `irivas-uma/rosma` on
-      GitHub) — closest structural match to JIGSAWS: da Vinci Research Kit
-      (dVRK) kinematic data (160 variables, 50Hz) + video, 207 trials, 12
-      users, novice/expert labelled. Data hosted on Zenodo
-      (record 3932964), **no access-request form needed** — direct download.
-      **Attempted 2026-09-09: Zenodo (zenodo.org) was unreachable — every
-      request (via curl and WebFetch, two different network paths) timed
-      out with a 504 after multiple retries.** This looks like a Zenodo-side
-      outage, not a block on our end (GitHub was reachable fine at the same
-      time). **Retried again 2026-09-09 (same day, minutes later): still
-      fully down**, including the plain zenodo.org homepage (not just the
-      API) — a genuine Zenodo-wide outage, not rate-limiting or a one-off
-      blip. **Retried a third time 2026-09-09 (later the same day): still
-      fully down** — same signature (curl API endpoint timeout, curl
-      zenodo.org homepage timeout, WebFetch 504), while GitHub was reachable
-      in ~1s in the same check. Three attempts spread across one day, same
-      symptom every time — strongly suggests a prolonged Zenodo-wide outage
-      rather than transient flakiness. **Not yet downloaded — retry again
-      after a longer gap** (e.g. a different day, not just later the same
-      session), then inspect `usingtheData/` in the GitHub repo for the real
-      column definitions before writing a loader.
-   2. **Self-collected pilot data** — record own RJ45/cable-termination
-      practice attempts using a phone IMU logging app (e.g. Sensor Logger),
-      label each attempt with completion time / error count as a mastery
-      proxy. Zero external dependency (no approval, no outage risk), and
-      literally the proposal's own domain — best fallback if both JIGSAWS
-      and ROSMA stall. Only an n=1 pilot, not a substitute for a real
-      validation dataset.
-
-      **Paused here 2026-09-09 — pick up next session:** still need to (a)
-      recommend a specific free phone IMU-logging app, (b) explain how to
-      export the recorded data, and (c) decide where it lands under
-      `simulation/data/` and what filename/label convention to use before
-      writing a loader for it.
-   3. **EPIC-Skills2018** / **BEST** (`hazeld/EPIC-Skills2018`,
-      `hazeld/rank-aware-attention-network` on GitHub) — public, no request
-      form, pairwise novice/expert video skill judgments across everyday
-      manual tasks (dough rolling, chopsticks, tie-tying, egg-scrambling,
-      etc.). Video-based, not kinematic/IMU — would need pose/motion feature
-      extraction first, so more engineering effort than ROSMA.
-   4. **Assembly101** — industrial toy-vehicle assembly/disassembly, closer
-      task flavour to patch-panel/RJ45 wiring than surgery, has mistake
-      annotations usable as a skill proxy. Now on Hugging Face
-      (`cvml-nus/assembly101`) as well as Google Drive; Google Drive access
-      is time-limited (14 days per request). Larger and heavier than the
-      other options — treat as last resort.
-2. **Riiid! Answer Correctness** (Kaggle) — real student interaction logs,
+1. **Self-collected pilot data** — record own RJ45/cable-termination
+   practice attempts using a phone IMU logging app (e.g. Sensor Logger),
+   label each attempt with completion time / error count as a mastery proxy
+   (same style as ROSMA's Time/Errors/Score). Zero external dependency (no
+   approval, no outage risk), and literally the proposal's own domain — now
+   the most direct remaining path to a domain-matched check, since it's an
+   n=1 pilot but at least in the *right* domain (unlike ROSMA's surgical
+   teleoperation). Still need to (a) recommend a specific free phone
+   IMU-logging app, (b) explain how to export the recorded data, and (c)
+   decide where it lands under `simulation/data/` and what
+   filename/label convention to use before writing a loader for it — this
+   was paused mid-decision before Phase 4 and is still open.
+2. **Follow up on ROSMA's person-identity-confound lead** (Phase 4's Check
+   4: per-user-normalized features raised held-out accuracy from 47.6% to
+   61.9%, but on only 21 test trials from 2 users) — worth a supervisor
+   discussion on whether this is worth writing up as a documented open
+   question rather than further chasing on a dataset this small (only 12
+   users total, no more signal to extract by re-tuning).
+3. **EPIC-Skills2018** / **BEST** (`hazeld/EPIC-Skills2018`,
+   `hazeld/rank-aware-attention-network` on GitHub) — public, no request
+   form, pairwise novice/expert video skill judgments across everyday manual
+   tasks (dough rolling, chopsticks, tie-tying, egg-scrambling, etc.).
+   Video-based, not kinematic/IMU — would need pose/motion feature
+   extraction first, so more engineering effort than ROSMA was.
+4. **Assembly101** — industrial toy-vehicle assembly/disassembly, closer
+   task flavour to patch-panel/RJ45 wiring than surgery, has mistake
+   annotations usable as a skill proxy. Now on Hugging Face
+   (`cvml-nus/assembly101`) as well as Google Drive; Google Drive access is
+   time-limited (14 days per request). Larger and heavier than the other
+   options — treat as last resort.
+5. **Riiid! Answer Correctness** (Kaggle) — real student interaction logs,
    much larger than ASSISTments; optional robustness cross-check on Phase 3's
    BKT fit (ASSISTments 2009-2010 is already done — see Phase 3 above) rather
    than a required next step now.
-3. Discuss with supervisor: how should calibrated uncertainty factor into the
+6. Discuss with supervisor: how should calibrated uncertainty factor into the
    mastery-conditioned utility function (see Phase 2b/Phase 3's open question
    above)? The proposal's own formula (Section 9.5) treats it as a gate input
    (`r_k`), not a utility term — worth resolving before going further. Now

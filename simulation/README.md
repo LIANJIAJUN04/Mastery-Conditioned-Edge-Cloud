@@ -6,7 +6,7 @@ This project supports the core argument of `mastery-conditioned-edge-cloud-propo
 > much the learner has mastered, not only on how uncertain the model is.
 
 It combines a **from-scratch policy simulation** (no dataset needed to test
-the routing *logic*) with **three real, independently sourced datasets** that
+the routing *logic*) with **four real, independently sourced datasets** that
 each ground one specific assumption the simulation used to make synthetically:
 
 | # | Dataset | Grounds |
@@ -14,13 +14,18 @@ each ground one specific assumption the simulation used to make synthetically:
 | 1 | **UCI HAR** (real wearable IMU, 30 subjects) | The "sensing → tiny edge model → uncertainty" pipeline (§9.1/§9.4) + the cross-subject-split methodology warning (§13.2) |
 | 2 | **PAMAP2** (real wearable IMU, 9 subjects, 3-sensor) | An independent replication of dataset #1's two findings, on a different sensor configuration |
 | 3 | **ASSISTments 2009-2010** (real student learning logs) | The Bayesian Knowledge Tracing model itself (§6.4/§9.3) — real, EM-fitted p_init/p_learn/p_slip/p_guess instead of hand-picked ranges |
+| 4 | **ROSMA** (real surgical-robot kinematics, 12 users, psychomotor skill) | RQ1: whether mastery is recoverable from real sensor data at all, in a real (if not identical) psychomotor-skill domain — see Section 10 |
 
-None of the three is a real *psychomotor-skill-with-mastery-labels* dataset
-(that is what JIGSAWS/ROSMA are for — see Section 10, still pending). What
-they do, honestly: replace three specific hand-picked assumptions in the
-simulation with values measured from real data, one assumption per dataset.
+Datasets #1-#3 each ground a specific *component* of the pipeline (real
+sensing+uncertainty, real knowledge-tracing math) with data from adjacent
+domains. Dataset #4 (ROSMA) is different in kind: it's the first real test of
+whether mastery itself is recoverable from sensor data on an actual
+psychomotor-skill task — JIGSAWS (the closest domain match) was **rejected**
+on access request, ROSMA is the documented backup (see Section 10). Its
+result is an honest, genuinely mixed finding — read Section 10 before citing
+it, don't just take the headline number.
 
-**All three real-data training pipelines use a proper, group-disjoint
+**All four real-data training pipelines use a proper, group-disjoint
 70% train / 20% test / 10% validation split** — see Section 3.5.
 
 ---
@@ -53,9 +58,9 @@ This creates an isolated Python environment (`venv/`) just for this project,
 and installs 5 libraries: `numpy`, `pandas`, `matplotlib`, `scipy`,
 `scikit-learn`. This step only needs to be done once.
 
-## 2. Get the raw data (one-time, ~800 MB total)
+## 2. Get the raw data (one-time, ~2.4 GB total)
 
-Three datasets, all public, no login/account needed. Run these from the
+Four datasets, all public, no login/account needed. Run these from the
 `simulation/` folder:
 
 ```powershell
@@ -73,6 +78,17 @@ tar -xf data\pamap2_raw\PAMAP2_Dataset.zip PAMAP2_Dataset/Protocol -C data
 # dataset formatted for BKT work)
 mkdir data\assistments
 curl.exe -o data\assistments\as.csv "https://raw.githubusercontent.com/CAHLR/pyBKT-examples/master/data/as.csv"
+
+# Dataset #4: ROSMA (~1.6 GB, 207 kinematic CSVs, hosted on Zenodo —
+# zenodo.org had a multi-day outage in Sept 2026, retry later if it 504s).
+# Only the kinematics + scores.csv are needed, not the (much larger) videos.
+# See simulation/data/ROSMA/ for the exact files; download by iterating the
+# Zenodo API record https://zenodo.org/api/records/3932964 for every file
+# whose key ends in .csv (skip "questionnaire" and keep scores.csv), saving
+# kinematic trial CSVs into data\ROSMA\kinematics\ and scores.csv into
+# data\ROSMA\. A single-threaded curl loop is very slow against Zenodo's
+# per-connection throttling (~85 KB/s observed) — download several files
+# concurrently (e.g. a small thread pool) to finish in reasonable time.
 ```
 
 You only need to do this once. `run_experiment.py` (next section) will tell
@@ -107,7 +123,7 @@ terminal, without activating anything first:
 .\venv\Scripts\python.exe run_experiment.py
 ```
 
-**One command runs the whole pipeline, all 3 datasets included.**
+**One command runs the whole Phase-1-3 pipeline (datasets #1-3).**
 `run_experiment.py` automatically checks for each dataset's processed output
 and, if missing, runs that dataset's script first:
 
@@ -116,13 +132,19 @@ and, if missing, runs that dataset's script first:
 3. `fit_bkt_assistments.py` (dataset #3, ASSISTments) → `results/bkt_real_fit_report.json`
 4. the Phase 1 policy simulation, now grounded in all three
 
-You never need to run the four scripts separately unless you specifically
+You never need to run these three scripts separately unless you specifically
 want to inspect one dataset's own output first (each prints its own numbers
 and writes its own report — see Sections 7-9). Re-run any time with the same
 one command — the three data-processing steps are skipped once their output
 files exist, so a repeat run only re-does the simulation itself (a few
 seconds); delete the relevant `results/*.json`/`*.csv` if you want to force
 a dataset's script to re-run.
+
+**Dataset #4 (ROSMA) is a separate, standalone RQ1 check — not part of
+`run_experiment.py`'s chain**, since it tests a different question (is
+mastery recoverable from sensor data at all) rather than feeding a parameter
+into the Phase 1 routing simulation. Run it on its own:
+`.\venv\Scripts\python.exe train_rosma_classifier.py` — see Section 10.
 
 This will:
 1. Train a RandomForest edge-model surrogate on real IMU data (twice — HAR
@@ -242,17 +264,23 @@ Open the PNGs for the visual picture:
 | `src/real_data.py`, `train_activity_classifier.py` | §9.4, §13.2 | Dataset #1 (UCI HAR): edge classifier, calibration check, split-inflation check |
 | `src/pamap2_data.py`, `train_pamap2_classifier.py` | §9.4, §13.2 (replication) | Dataset #2 (PAMAP2): independent replication of the same two checks |
 | `src/assistments_data.py`, `src/bkt_fit.py`, `fit_bkt_assistments.py` | §6.4, §9.3 | Dataset #3 (ASSISTments): real EM/Baum-Welch fit of the BKT model, with validation-based early stopping |
+| `src/rosma_data.py`, `train_rosma_classifier.py` | RQ1 (§4, §12) | Dataset #4 (ROSMA): first real test of whether mastery is recoverable from sensor data on a psychomotor-skill task — standalone, does not feed into the Phase 1 simulation |
 
 ## 6. Honest limitations of this simulation
 
-- **Still no real psychomotor-skill data.** All three datasets ground a real
-  *component* of the pipeline (perception, or the knowledge-tracing math) —
-  none of them is real wearable data *with mastery labels on the proposal's
-  actual domain* (RJ45/fibre/patch-panel skills). That is what JIGSAWS/ROSMA
-  are for (Section 10) — this simulation still cannot show that mastery is
-  estimable from real sensor data *in this specific domain*, only that the
-  general mechanisms (BKT fitting, wearable-IMU classification +
-  uncertainty) behave sensibly on real data in adjacent domains.
+- **Real psychomotor-skill data (ROSMA) gives a genuinely mixed, not
+  confirmatory, answer to RQ1.** Datasets #1-#3 ground a real *component* of
+  the pipeline (perception, or the knowledge-tracing math); ROSMA (Section
+  10) is the first attempt at the actual question — is mastery recoverable
+  from real sensor data on a real psychomotor-skill task — and the honest
+  result is: a naive whole-trial-kinematics classifier does **not** clearly
+  beat chance on users it has never seen (47.6%, n=21 held-out trials from
+  only 2 users), though a per-user-baseline-normalized version does better
+  (61.9%) — suggestive that the signal exists but is confounded by
+  between-person differences at this small sample size, not proof either
+  way. RJ45/fibre/patch-panel skills are also a different (if related)
+  motor-skill domain from robotic-surgery teleoperation. Treat RQ1 as
+  **opened, not closed**, by this dataset.
 - **ASSISTments is a different domain** (academic/cognitive skills — algebra,
   fractions — not psychomotor motor skills). Its fitted BKT parameters
   validate the *machinery*, not literal numbers for cable-termination tasks.
@@ -429,18 +457,85 @@ underestimated in the original synthetic design, which is exactly the kind
 of thing this dataset was fetched to check, and exactly why Section 4's
 results shifted the way they did.
 
-## 10. Remaining next steps
+## 10. Dataset #4 — ROSMA (real psychomotor-skill kinematics, RQ1 test)
 
-- **JIGSAWS** — access-request form submitted 2026-09-09, awaiting approval.
-  Still the top priority: the only candidate that is both real motor-skill
-  data *and* has actual novice/intermediate/expert mastery labels, closest
-  domain match to the proposal.
-- **ROSMA** (backup for JIGSAWS) — Zenodo (its host) was unreachable on
-  2026-09-09 (checked again this session: still down, a genuine platform-wide
-  outage, not a one-off). Retry later; no access-request form needed once
-  Zenodo is back.
+**Background**: JIGSAWS (surgical robot kinematics with actual
+novice/intermediate/expert labels, the closest public domain match to the
+proposal) was **rejected** on access request (submitted 2026-09-09, rejected
+by 2026-09-15). ROSMA — da Vinci Research Kit (dVRK) kinematic data, 12
+users, 3 training maneuvers (Post-and-Sleeve, Pea-on-a-Peg, Wire-Chaser-I), 6
+repetitions each — was the documented backup. Its host, Zenodo, had a
+multi-day outage through 2026-09-09; it was back up by 2026-09-15 and the
+dataset was downloaded then. https://zenodo.org/records/3932964
+
+**Why ROSMA is the right test for RQ1 even though it isn't network-cabling
+skills**: it is the first dataset in this project with a genuine, repeated,
+real psychomotor-skill *practice trajectory* — each user attempts the same
+maneuver 6 times, and completion time/error count visibly improve across
+repetitions (a real learning curve, not a simulated one). No other dataset
+here has that structure.
+
+**Mastery proxy and features** (full detail in `src/rosma_data.py`
+docstring): no per-trial novice/expert label exists (unlike JIGSAWS), so
+repetitions 1-2 of each (user, task) sequence are labelled "early"
+(lower-mastery) and repetitions 5-6 "late" (higher-mastery); the middle two
+repetitions are held out of binary-classifier training and used only for a
+monotonic-trend check. Features are whole-trial mean/std/min/max of all 154
+numeric kinematic channels (position/orientation/velocity/wrench/joint data
+for the two master consoles and two patient-side robot arms) — 616
+features/trial. One corrupted row (`X11_Pea_on_a_Peg_01`, a ~1000x
+decimal-point logging error in the source `scores.csv`) is dropped.
+
+Run standalone with `.\venv\Scripts\python.exe train_rosma_classifier.py`.
+**Four checks, on a 12-user 70/20/10 split (8 train / 2 test / 2
+validation users — `X05`,`X11` held out as test, seed 42)**:
+
+| Check | Result | Verdict |
+|---|---|---|
+| 1. Cross-user early-vs-late accuracy (raw features) | **47.6%** (n=21 test trials, chance=50%) | ❌ does not beat chance |
+| — calibration on check 1 | mean confidence 82.0% vs 47.6% accuracy | overconfident, ECE=0.343 (poor) |
+| 2. Predicted P(late) vs repetition number, Spearman | rho=0.16, p=0.37 | ❌ not significant |
+| 3. §13.2 replicate: proper vs improper split | 47.6% proper vs 58.5% improper | ✅ inflation direction replicates (+10.9pp) a 4th time, on a very different dataset — even though the "inflated" number itself is barely above chance |
+| 4. (exploratory) per-(user,task)-normalized features, same split | **61.9%** | directionally supports the "person-identity confound" hypothesis below, but n=21 — not conclusive |
+
+**Honest interpretation — read this before citing any of the above**: Check 1
+is the primary, pre-registered-in-spirit test of RQ1, and it came back **at
+or below chance**. This is a genuine negative result, not hidden. Check 4
+was added *after* seeing Check 1 fail, specifically to test one concrete
+hypothesis for *why*: raw whole-trial kinematics mix between-person baseline
+differences (body size, motion style, overall skill level) with the
+within-person practice-related change that should actually transfer to a new
+person. Normalizing each trial against its own (user, task) group's mean/std
+removes the between-person component; accuracy rising from 47.6% to 61.9%
+under that normalization is *consistent* with the confound hypothesis, but
+with only 2 held-out users / 21 trials, a single number swinging 14pp is well
+within what small-sample noise alone could produce — this is a lead worth
+following with more users, not a demonstrated fix.
+
+**Bottom line for RQ1**: this project's first real test of "can mastery be
+estimated from real sensor data, in a real psychomotor-skill domain" did
+**not** produce a clean confirmation. It surfaced a plausible, specific
+reason (person-identity confound) and one piece of suggestive evidence for
+it, on a sample too small to settle the question. RQ1 stays genuinely open —
+report it that way to your supervisor, not as either "confirmed" or "ROSMA
+doesn't work."
+
+Outputs: `results/rosma_report.json` (all four checks), `results/rosma_mastery_trend.png`
+(predicted P(late) by repetition, held-out users), `results/rosma_reliability_diagram.png`.
+
+## 11. Remaining next steps
+
+- **RQ1 is still open** (Section 10) — the natural next step is more ROSMA
+  users' worth of signal, which doesn't exist in this dataset (only 12
+  users total), so this really means: (a) discuss with supervisor whether
+  the per-user-normalization lead (Check 4) is worth a small dedicated
+  write-up as a documented open question, or (b) fall back to
+  self-collected pilot data (below) for a domain-matched, if n=1, check.
 - **Self-collected pilot data** (own RJ45/cable-termination attempts via a
-  phone IMU logging app) remains the zero-dependency fallback if both stall.
+  phone IMU logging app) is now the most direct remaining path to a
+  domain-matched motor-skill check, since both JIGSAWS (rejected) and ROSMA
+  (tested, genuinely mixed result) are exhausted as *public* options. Zero
+  external dependency (no approval, no outage risk).
 - **Discuss with supervisor**: Section 4's finding sharpens the open question
   already on record — B4 ignoring the real, pooled uncertainty signal now
   costs even more accuracy once real BKT parameters are also plugged in.

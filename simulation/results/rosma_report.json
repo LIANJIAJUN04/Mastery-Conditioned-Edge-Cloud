@@ -1,0 +1,68 @@
+{
+  "dataset": "ROSMA",
+  "n_trials_loaded": 206,
+  "n_users": 12,
+  "n_labelled_trials": 134,
+  "split": {
+    "train_users": [
+      "X01",
+      "X03",
+      "X04",
+      "X06",
+      "X07",
+      "X08",
+      "X10",
+      "X12"
+    ],
+    "test_users": [
+      "X05",
+      "X11"
+    ],
+    "val_users": [
+      "X02",
+      "X09"
+    ],
+    "best_hyperparameters": {
+      "n_estimators": 100,
+      "max_depth": null
+    },
+    "validation_accuracy": 0.5454545454545454
+  },
+  "check1_early_vs_late_test_accuracy": 0.47619047619047616,
+  "check1_per_task_accuracy": {
+    "Post_and_Sleeve": {
+      "n": 7,
+      "accuracy": 0.42857142857142855
+    },
+    "Pea_on_a_Peg": {
+      "n": 6,
+      "accuracy": 0.5
+    },
+    "Wire_Chaser_I": {
+      "n": 8,
+      "accuracy": 0.5
+    }
+  },
+  "check1_mean_confidence": 0.8196507936507936,
+  "check1_calibration_direction": "overconfident",
+  "check1_expected_calibration_error": 0.34346031746031747,
+  "check2_spearman_rho_repetition_vs_p_late": 0.15999456287998443,
+  "check2_spearman_pvalue": 0.37378344877494846,
+  "check2_mean_p_late_by_repetition": {
+    "1": 0.48,
+    "2": 0.27666666666666667,
+    "3": 0.2383333333333333,
+    "4": 0.5366666666666666,
+    "5": 0.3383333333333333,
+    "6": 0.5906666666666667
+  },
+  "check3_proper_split_accuracy": 0.47619047619047616,
+  "check3_improper_random_split_accuracy": 0.5853658536585366,
+  "check3_accuracy_inflation_pp": 10.917537746806039,
+  "check4_per_user_normalized_test_accuracy": 0.6190476190476191,
+  "check4_hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": null
+  },
+  "check4_validation_accuracy": 0.7272727272727273
+}
