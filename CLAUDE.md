@@ -315,7 +315,11 @@ now exhausted; what's left, in priority order:
 - Keep results **honest, including negative/partial findings** — the user
   and this project explicitly value documenting what *didn't* work and why,
   not just successes (mirrors the proposal's own "Limitations" section style).
-- This is not a git repository. Treat file deletions as risky; prefer
+- This IS a git repository (`origin` = `github.com/LIANJIAJUN04/Mastery-Conditioned-Edge-Cloud`).
+  `.gitignore` deliberately excludes `Weekly Report/` (kept local only —
+  don't push it without asking first), `simulation/venv/`, and
+  `simulation/data/` (raw datasets, large — see README.md Section 2 to
+  re-download). Still treat file deletions as risky regardless; prefer
   move-and-backup (as was done with the FYP CSV) over deleting.
 - The user is a beginner in software engineering — explain setup/run steps
   in full, don't assume familiarity with Python tooling.
