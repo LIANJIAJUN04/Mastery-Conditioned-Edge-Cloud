@@ -1,0 +1,59 @@
+{
+  "section_13_2_check": {
+    "proper_cross_subject_accuracy": 0.9287410926365796,
+    "improper_random_split_accuracy": 0.9799352750809062,
+    "accuracy_inflation_pp": 5.11941824443266
+  },
+  "split_70_20_10": {
+    "n_train_subjects": 21,
+    "n_test_subjects": 6,
+    "n_val_subjects": 3,
+    "n_train": 7369,
+    "n_val": 913,
+    "n_test": 2017,
+    "best_hyperparameters": {
+      "n_estimators": 200,
+      "max_depth": null
+    },
+    "validation_accuracy": 0.8652792990142387,
+    "grid_search_trace": [
+      {
+        "n_estimators": 100,
+        "max_depth": null,
+        "val_accuracy": 0.8608981380065718
+      },
+      {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "val_accuracy": 0.8608981380065718
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": null,
+        "val_accuracy": 0.8652792990142387
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": 20,
+        "val_accuracy": 0.864184008762322
+      },
+      {
+        "n_estimators": 300,
+        "max_depth": null,
+        "val_accuracy": 0.8652792990142387
+      },
+      {
+        "n_estimators": 300,
+        "max_depth": 20,
+        "val_accuracy": 0.8630887185104053
+      }
+    ],
+    "test_accuracy": 0.9484382746653446
+  },
+  "mean_uncertainty_correct": 0.2164272223729531,
+  "mean_uncertainty_incorrect": 0.3803571435898651,
+  "expected_calibration_error": 0.0954115022310362,
+  "mean_confidence": 0.8530267724343084,
+  "calibration_direction": "underconfident",
+  "n_classes": 6
+}

@@ -1,0 +1,51 @@
+{
+  "datasets_used": {
+    "1_uci_har": "edge classifier + uncertainty/calibration (Phase 2a)",
+    "2_pamap2": "independent replication of Phase 2a's checks + pooled into empirical uncertainty",
+    "3_assistments_2009_2010": "real EM-fitted BKT parameters (Phase 3), used in build_trial_contexts"
+  },
+  "E1_offload_reduction_vs_B3": {
+    "b3_offload_rate": 0.20770833333333333,
+    "b4_offload_rate": 0.04888888888888889,
+    "offload_reduction_pct": 76.4627214978268,
+    "accuracy_drop_pp": 6.634791666666661,
+    "meets_E1_target(35-60%, <=2pp drop)": false
+  },
+  "E2_inverted_U_shape_by_trial_index": {
+    "B4_mastery_conditioned": {
+      "a": 0.0001716471678832224,
+      "b": -0.0137008607785935,
+      "c": 0.25220848757271297,
+      "vertex_trial_idx": 39.909952921316695,
+      "is_inverted_u": false
+    },
+    "B3_uncertainty_network (should NOT show inverted-U)": {
+      "a": 2.5478086701255925e-05,
+      "b": -0.002316280191228505,
+      "c": 0.2462249911863212,
+      "vertex_trial_idx": 45.45632131619847,
+      "is_inverted_u": false
+    }
+  },
+  "E2_inverted_U_shape_by_mastery_level": {
+    "B4_mastery_conditioned": {
+      "a": -2.21609201176239,
+      "b": 1.8498941750973217,
+      "c": 0.17390563212966112,
+      "vertex_trial_idx": 0.4173775649383253,
+      "is_inverted_u": true
+    },
+    "B3_uncertainty_network (should NOT show inverted-U)": {
+      "a": 0.4435071110533522,
+      "b": -0.7722334519634947,
+      "c": 0.5239630474600663,
+      "vertex_trial_idx": 0.8705987262858091,
+      "is_inverted_u": false
+    }
+  },
+  "E3_latency_energy_reduction_vs_B3": {
+    "latency_reduction_pct": 44.97832181023502,
+    "energy_reduction_pct": 47.61840711535552,
+    "meets_E3_target(>=30% latency, >=25% energy)": true
+  }
+}

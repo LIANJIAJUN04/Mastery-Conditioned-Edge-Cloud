@@ -1,0 +1,57 @@
+{
+  "n_skills_fitted": 25,
+  "min_users_per_skill": 100,
+  "split": "70% train / 20% test / 10% validation, by student, per skill",
+  "param_summary": {
+    "p_init": {
+      "median": 0.5805216003461526,
+      "p25": 0.45827548520618194,
+      "p75": 0.6908290280240812,
+      "min": 0.2576914486575837,
+      "max": 0.8329844062984305,
+      "synthetic_range_used_in_phase1": [
+        0.08,
+        0.18
+      ]
+    },
+    "p_learn": {
+      "median": 0.08625683496854526,
+      "p25": 0.06539264507427187,
+      "p75": 0.13882532752653226,
+      "min": 0.004455862068386292,
+      "max": 0.3735825394914535,
+      "synthetic_range_used_in_phase1": [
+        0.1,
+        0.14
+      ]
+    },
+    "p_slip": {
+      "median": 0.17203472618153276,
+      "p25": 0.1328373633122613,
+      "p75": 0.21350689908588352,
+      "min": 0.06748898372702858,
+      "max": 0.3466472986471965,
+      "synthetic_range_used_in_phase1": [
+        0.08,
+        0.12
+      ]
+    },
+    "p_guess": {
+      "median": 0.33965940352036933,
+      "p25": 0.2417299079905912,
+      "p75": 0.39696358948397525,
+      "min": 0.0702492812244431,
+      "max": 0.4804789838437684,
+      "synthetic_range_used_in_phase1": [
+        0.18,
+        0.22
+      ]
+    }
+  },
+  "held_out_test_generalization": {
+    "mean_test_predictive_accuracy": 0.7263155593298677,
+    "mean_test_majority_class_baseline": 0.7086382432328482,
+    "mean_test_loglik_per_obs": -0.5616398197088915,
+    "n_skills_where_model_beats_majority_baseline": 13
+  }
+}

@@ -1,0 +1,20 @@
+# Weekly reports (kept local only)
+Weekly Report/
+
+# Python virtual environment
+simulation/venv/
+
+# Raw datasets (large, downloadable from their original sources - see simulation/README.md)
+simulation/data/
+simulation/simulation/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Scratch files from ROSMA download attempts (not project source)
+scratch_rosma_filelist.json

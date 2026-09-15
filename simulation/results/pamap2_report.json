@@ -1,0 +1,90 @@
+{
+  "dataset": "PAMAP2",
+  "section_13_2_check": {
+    "test_subjects_held_out": [
+      108,
+      109
+    ],
+    "proper_cross_subject_accuracy": 0.8210831721470019,
+    "improper_random_split_accuracy": 0.9414253897550111,
+    "accuracy_inflation_pp": 12.034221760800923
+  },
+  "split_70_20_10": {
+    "train_subjects": [
+      101,
+      103,
+      104,
+      105,
+      107,
+      108
+    ],
+    "test_subjects": [
+      102,
+      106
+    ],
+    "val_subjects": [
+      109
+    ],
+    "n_train": 10964,
+    "n_val": 48,
+    "n_test": 3953,
+    "best_hyperparameters": {
+      "n_estimators": 100,
+      "max_depth": null
+    },
+    "validation_accuracy": 0.9375,
+    "grid_search_trace": [
+      {
+        "n_estimators": 100,
+        "max_depth": null,
+        "val_accuracy": 0.9375
+      },
+      {
+        "n_estimators": 100,
+        "max_depth": 20,
+        "val_accuracy": 0.9375
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": null,
+        "val_accuracy": 0.9375
+      },
+      {
+        "n_estimators": 200,
+        "max_depth": 20,
+        "val_accuracy": 0.9375
+      },
+      {
+        "n_estimators": 300,
+        "max_depth": null,
+        "val_accuracy": 0.9375
+      },
+      {
+        "n_estimators": 300,
+        "max_depth": 20,
+        "val_accuracy": 0.9375
+      }
+    ],
+    "test_accuracy": 0.8856564634454844
+  },
+  "mean_uncertainty_correct": 0.36681027495927104,
+  "mean_uncertainty_incorrect": 0.6046404505347737,
+  "expected_calibration_error": 0.19687579053883128,
+  "mean_confidence": 0.6887806729066531,
+  "calibration_direction": "underconfident",
+  "n_classes": 12,
+  "activity_names_present": [
+    "Nordic_walking",
+    "ascending_stairs",
+    "cycling",
+    "descending_stairs",
+    "ironing",
+    "lying",
+    "rope_jumping",
+    "running",
+    "sitting",
+    "standing",
+    "vacuum_cleaning",
+    "walking"
+  ]
+}
