@@ -270,29 +270,63 @@ was rejected. Both of the two top-priority real-data candidates for RQ1 are
 now exhausted; what's left, in priority order:
 
 1. **Self-collected pilot data** — record own RJ45/cable-termination
-   practice attempts using a phone IMU logging app (e.g. Sensor Logger),
-   label each attempt with completion time / error count as a mastery proxy
-   (same style as ROSMA's Time/Errors/Score). Zero external dependency (no
-   approval, no outage risk), and literally the proposal's own domain — now
-   the most direct remaining path to a domain-matched check, since it's an
-   n=1 pilot but at least in the *right* domain (unlike ROSMA's surgical
-   teleoperation). Still need to (a) recommend a specific free phone
-   IMU-logging app, (b) explain how to export the recorded data, and (c)
-   decide where it lands under `simulation/data/` and what
-   filename/label convention to use before writing a loader for it — this
-   was paused mid-decision before Phase 4 and is still open.
-2. **Follow up on ROSMA's person-identity-confound lead** (Phase 4's Check
-   4: per-user-normalized features raised held-out accuracy from 47.6% to
-   61.9%, but on only 21 test trials from 2 users) — worth a supervisor
-   discussion on whether this is worth writing up as a documented open
-   question rather than further chasing on a dataset this small (only 12
-   users total, no more signal to extract by re-tuning).
+   practice attempts using a phone IMU logging app, label each attempt with
+   completion time / error count as a mastery proxy (same style as ROSMA's
+   Time/Errors/Score). Zero external dependency (no approval, no outage
+   risk), and literally the proposal's own domain — the most direct
+   remaining path to a domain-matched check, since it's an n=1 pilot but at
+   least in the *right* domain (unlike ROSMA's surgical teleoperation).
+   **App/export/storage decisions now resolved (2026-09-27):**
+   - App: **Sensor Logger** (Kelvin Choi; free, iOS+Android, no
+     login) — exports accelerometer/gyroscope to CSV directly.
+   - Recording settings: accelerometer + gyroscope only, **50Hz** (matches
+     UCI HAR's convention), phone **wrist-worn** (armband/strap — matches
+     the proposal's wearable framing, unlike HAR's waist mount).
+   - Export: in-app Export → CSV per session (zip with `Accelerometer.csv`,
+     `Gyroscope.csv`, `Metadata.csv`), transfer to computer, unzip.
+   - Storage convention: `simulation/data/self_collected/` with a master
+     `sessions.csv` label log (columns: session_id, task, rep_number, date,
+     completion_time_sec, error_count, notes — mirrors ROSMA's scores.csv)
+     plus one subfolder per recording named
+     `<task>_rep<NN>_<YYYYMMDD_HHMMSS>/` holding that session's raw CSVs.
+     `sessions.csv` template already created (header row only, no data yet).
+   - Task priority (**revised 2026-09-27**): **patch-panel punch-down on a
+     tool-less/reusable keystone jack** is now primary, not RJ45 crimping —
+     user flagged that crimping is one-way (a crimped connector can't be
+     redone, only replaced), whereas a tool-less keystone jack's wire clips
+     open and re-close by hand, so the same module can be re-terminated
+     unlimited times with zero consumed material (only a one-time-stripped
+     length of cable, reused every rep). RJ45 crimping demoted to a
+     secondary/optional task (materials are cheap, but punch-down has no
+     downside here); **fibre prep still deprioritized** (needs a fusion
+     splicer/cleaver — not realistic for a solo pilot).
+   - Still open: actually record the sessions, then write
+     `src/self_collected_data.py` (naming to match `rosma_data.py` /
+     `pamap2_data.py` convention) once real files exist. Given n=1, this
+     feeds the same early/late RQ1-style check Phase 4 did on ROSMA, not
+     `run_experiment.py`'s E1/E2/E3 simulation.
+2. ~~Follow up on ROSMA's person-identity-confound lead~~ — **RESOLVED
+   2026-09-27.** Ajay delegated this decision back to the student rather
+   than deciding it himself. Resolution: documented as an open question,
+   not chased further (option 1 from `Supervisor_Discussion_Notes_Phase4.md`,
+   combined with option 3's framing — the null result itself supports
+   BKT's per-learner design over a pooled sensor classifier). Full reasoning
+   in `simulation/README.md` Section 10's "Resolution of the Q1 open design
+   question" note. No further ROSMA-specific work planned.
 3. **EPIC-Skills2018** / **BEST** (`hazeld/EPIC-Skills2018`,
-   `hazeld/rank-aware-attention-network` on GitHub) — public, no request
-   form, pairwise novice/expert video skill judgments across everyday manual
-   tasks (dough rolling, chopsticks, tie-tying, egg-scrambling, etc.).
-   Video-based, not kinematic/IMU — would need pose/motion feature
-   extraction first, so more engineering effort than ROSMA was.
+   `hazeld/rank-aware-attention-network` on GitHub) — investigated
+   2026-09-27 as a non-hardware path while pilot-data hardware was still
+   being acquired. Engineering effort is lower than this note originally
+   assumed (the companion repo already ships pre-extracted I3D features and
+   ready-made pairwise splits), but **deprioritized anyway**: labels are
+   pairwise ("A better than B"), not absolute/early-late like ROSMA's;
+   reusing someone else's already-extracted deep-CNN features breaks from
+   this project's own from-scratch-pipeline practice (Phases 2a-4); none of
+   its 7 tasks (chopstick use, hand drawing, sonic drawing, dough rolling,
+   surgery) are in the network-engineering domain, and "surgery" duplicates
+   ROSMA/JIGSAWS territory rather than adding a new angle. Not deleted from
+   this list — revisit only if the pilot data stalls again or priorities
+   change.
 4. **Assembly101** — industrial toy-vehicle assembly/disassembly, closer
    task flavour to patch-panel/RJ45 wiring than surgery, has mistake
    annotations usable as a skill proxy. Now on Hugging Face
@@ -303,12 +337,22 @@ now exhausted; what's left, in priority order:
    much larger than ASSISTments; optional robustness cross-check on Phase 3's
    BKT fit (ASSISTments 2009-2010 is already done — see Phase 3 above) rather
    than a required next step now.
-6. Discuss with supervisor: how should calibrated uncertainty factor into the
-   mastery-conditioned utility function (see Phase 2b/Phase 3's open question
-   above)? The proposal's own formula (Section 9.5) treats it as a gate input
-   (`r_k`), not a utility term — worth resolving before going further. Now
-   more pressing than before: Phase 3 showed real BKT parameters make B4's
-   accuracy cost for ignoring uncertainty even larger.
+6. ~~Discuss with supervisor: how should calibrated uncertainty factor into
+   the mastery-conditioned utility function?~~ — **RESOLVED 2026-09-27.**
+   Ajay delegated this decision back to the student too. Resolution:
+   implemented option 2 from `Supervisor_Discussion_Notes_Phase4.md` (Q2) —
+   a mastery-gated *weighted* uncertainty term in
+   `src/policies.py::policy_mastery_conditioned`
+   (`UNCERTAINTY_WEIGHT = 1.0`, un-tuned, symmetric with the escalation
+   term), which only lets uncertainty influence the decision where mastery
+   is itself ambiguous — the specific fix for why the earlier hard-override
+   attempt (Phase 2b) broke E2. **Honest result**: helps but doesn't close
+   the gap — E1 improved from 76.5%/6.6pp to 70.0%/6.3pp (still misses
+   target), and a sensitivity sweep shows this is a structural limit (real
+   ASSISTments `p_init` is high enough that few trials ever sit near the
+   mastery boundary where this channel can act), not a tuning problem — see
+   `simulation/README.md` Section 4's "Resolution of the Q2 open design
+   question" note for full detail. E2 and E3 both still hold.
 
 ## Working conventions established this session
 

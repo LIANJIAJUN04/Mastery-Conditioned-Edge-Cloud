@@ -110,6 +110,17 @@ ESCALATION_BONUS = {"T": 0.0, "S": 0.1, "M": 0.45, "L": 0.8}
 BASE_VALUE_WEIGHT = 0.5
 LAMBDA_COST = 0.20  # trade-off weight between educational utility and system cost
 
+# Real uncertainty as a *weighted* utility input, not a gate (Discussion
+# Notes Phase 4, Q2, option 2). Gated by the same boundary_value as
+# escalation_value on purpose: the earlier hard "escalate if uncertainty is
+# high" rule (tried, reverted) fired uniformly across mastery levels -- a BKT
+# learner can "slip" at any mastery, not just near the boundary -- which
+# swamped E2's inverted-U. Weight of 1.0 is un-tuned (equal footing with
+# escalation_value, not a separately-fitted knob); a sweep confirmed the
+# inverted-U survives up to ~1.5 and breaks at 2.0+, so this sits with margin.
+UNCERTAINTY_BONUS = {"T": 0.0, "S": 0.1, "M": 0.45, "L": 0.8}
+UNCERTAINTY_WEIGHT = 1.0
+
 
 def cost(model_class: str, net: NetworkCondition) -> float:
     lat = expected_latency_ms(model_class, net)
@@ -124,6 +135,7 @@ def policy_mastery_conditioned(ctx: dict) -> str:
     is_critical = ctx["is_critical"]
     net: NetworkCondition = ctx["network"]
     feedback_type = ctx["feedback_type"]
+    uncertainty = ctx["uncertainty"]
 
     budget = latency_budget_ms(feedback_type)
     boundary_value = mastery_utility_term(mastery)
@@ -147,7 +159,8 @@ def policy_mastery_conditioned(ctx: dict) -> str:
         # paying the extra cost of a bigger class.
         base_value = BASE_VALUE_WEIGHT * engagement_factor
         escalation_value = ESCALATION_BONUS[cls] * boundary_value * engagement
-        educational_value = base_value + escalation_value
+        uncertainty_value = UNCERTAINTY_WEIGHT * UNCERTAINTY_BONUS[cls] * boundary_value * uncertainty
+        educational_value = base_value + escalation_value + uncertainty_value
 
         score = educational_value - LAMBDA_COST * cost(cls, net)
 

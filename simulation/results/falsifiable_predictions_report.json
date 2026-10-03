@@ -6,17 +6,17 @@
   },
   "E1_offload_reduction_vs_B3": {
     "b3_offload_rate": 0.20770833333333333,
-    "b4_offload_rate": 0.04888888888888889,
-    "offload_reduction_pct": 76.4627214978268,
-    "accuracy_drop_pp": 6.634791666666661,
+    "b4_offload_rate": 0.06229166666666667,
+    "offload_reduction_pct": 70.01003009027082,
+    "accuracy_drop_pp": 6.307708333333329,
     "meets_E1_target(35-60%, <=2pp drop)": false
   },
   "E2_inverted_U_shape_by_trial_index": {
     "B4_mastery_conditioned": {
-      "a": 0.0001716471678832224,
-      "b": -0.0137008607785935,
-      "c": 0.25220848757271297,
-      "vertex_trial_idx": 39.909952921316695,
+      "a": 0.00020428347109149422,
+      "b": -0.01653209406363962,
+      "c": 0.3109427331218052,
+      "vertex_trial_idx": 40.463611606235254,
       "is_inverted_u": false
     },
     "B3_uncertainty_network (should NOT show inverted-U)": {
@@ -29,10 +29,10 @@
   },
   "E2_inverted_U_shape_by_mastery_level": {
     "B4_mastery_conditioned": {
-      "a": -2.21609201176239,
-      "b": 1.8498941750973217,
-      "c": 0.17390563212966112,
-      "vertex_trial_idx": 0.4173775649383253,
+      "a": -1.3643796980915042,
+      "b": 0.712389468903166,
+      "c": 0.5343269956094086,
+      "vertex_trial_idx": 0.26106716110612654,
       "is_inverted_u": true
     },
     "B3_uncertainty_network (should NOT show inverted-U)": {
@@ -44,8 +44,8 @@
     }
   },
   "E3_latency_energy_reduction_vs_B3": {
-    "latency_reduction_pct": 44.97832181023502,
-    "energy_reduction_pct": 47.61840711535552,
+    "latency_reduction_pct": 38.64780294663293,
+    "energy_reduction_pct": 42.45842930880844,
     "meets_E3_target(>=30% latency, >=25% energy)": true
   }
 }

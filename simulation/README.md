@@ -204,10 +204,39 @@ Open `results/falsifiable_predictions_report.json` for the numeric verdicts:
 
 | Prediction | Result | Verdict |
 |---|---|---|
-| **E1** offload reduction (target 35-60%, ≤2pp accuracy drop) | 76.5% reduction, **6.6pp accuracy drop** | ❌ overshoots — reduces offload too aggressively, at real accuracy cost |
-| **E2** inverted-U by mastery level (mechanistic test) | B4 concave, peak at mastery≈0.42 (close to Phase-1-synthetic's 0.47); B3 not concave | ✅ confirmed |
+| **E1** offload reduction (target 35-60%, ≤2pp accuracy drop) | 70.0% reduction, **6.3pp accuracy drop** | ❌ still overshoots — improved from 76.5%/6.6pp (see uncertainty-weighting note below) but not enough to meet target |
+| **E2** inverted-U by mastery level (mechanistic test) | B4 concave, peak at mastery≈0.26-0.42 depending on `UNCERTAINTY_WEIGHT`; B3 not concave | ✅ confirmed |
 | **E2** inverted-U by trial index ("live classroom" view) | Neither B4 nor B3 shows a fitted inverted-U | ❌ not visible this way anymore (see explanation below) |
-| **E3** latency/energy reduction (target ≥30%/≥25%) | 45.0% / 47.6% | ✅ confirmed |
+| **E3** latency/energy reduction (target ≥30%/≥25%) | 38.6% / 42.5% | ✅ confirmed |
+
+**Resolution of the Q2 open design question (uncertainty as a weighted
+utility input) — decided 2026-09-27**: the supervisor delegated this design
+call back to the student rather than deciding it directly. `B4`
+(`policies.py::policy_mastery_conditioned`) now adds a real-uncertainty term
+to the utility score, gated by the same `boundary_value` term used for the
+escalation bonus (Discussion Notes Phase 4, Q2, option 2 — "mastery-dependent
+weighting"), so uncertainty can only influence the decision where mastery
+itself is ambiguous, not uniformly across all mastery levels (the specific
+failure mode that broke E2 in the previously-tried, reverted hard-override
+version). `UNCERTAINTY_WEIGHT = 1.0` was chosen as the *unweighted* default
+(uncertainty and escalation contribute on equal footing, not a separately
+fitted knob) rather than tuned to hit a target number; a sweep confirmed E2's
+mastery-level inverted-U survives up to weight≈1.5 and breaks at 2.0+, so 1.0
+sits with real margin, not at the edge.
+
+**Honest result of that change**: it helps, but does not resolve, the E1
+accuracy trade-off. Offload reduction improved from 76.5%→70.0% and the
+accuracy drop only from 6.6pp→6.3pp — both still miss E1's target. The
+sensitivity sweep shows *why* a larger weight can't close the gap without
+cost: pushing weight up to the point E2 just barely survives (1.5) only
+moves accuracy drop to ~6.2pp. The real bottleneck is structural, not a
+tuning problem — with real ASSISTments-fitted `p_init` this high (median
+≈0.58, see below), very few simulated trials ever sit near the mastery
+boundary where `boundary_value` — and therefore this uncertainty channel —
+is non-negligible, so there is little room for *any* uncertainty-weighting
+scheme to act on. This is reported as a genuine, still-open limitation of
+the mastery-conditioned design under real BKT parameters, not fixed by this
+change.
 
 **Why E1 now overshoots harder, and why E2 disappears in the trial-index view
 — read this before reporting these numbers**: the real ASSISTments-fitted
@@ -520,31 +549,51 @@ it, on a sample too small to settle the question. RQ1 stays genuinely open —
 report it that way to your supervisor, not as either "confirmed" or "ROSMA
 doesn't work."
 
+**Resolution of the Q1 open design question (keep chasing this lead, or
+document and move on) — decided 2026-09-27**: the supervisor delegated this
+call back to the student. Chose Discussion Notes Phase 4's option 1
+(document as an open question, stop here — ROSMA has no more held-out
+users' worth of signal to extract, 12 total, all used) combined with the
+framing in option 3: this null result, read one level up, is itself a point
+*in favour of* the proposal's own mastery-tracking design. A pooled/global
+sensor classifier that ignores who the learner is (Check 1) failed; one that
+implicitly calibrates per-learner (Check 4's per-user normalization) did
+much better on the same data. BKT-based mastery estimation *already*
+calibrates per-learner by construction (each learner gets their own hidden
+mastery trajectory, Section 6.4/9.3) — so if per-learner calibration matters
+this much for recovering a real motor-skill practice signal, that is an
+argument for routing on a per-learner BKT estimate specifically, rather than
+a pooled/global classifier reading raw sensor uncertainty (i.e. for B4's
+whole premise over B3's), worth stating explicitly in the final report/
+thesis rather than left as a coincidental side note. No further ROSMA-
+specific work planned; remaining RQ1 effort goes to the self-collected pilot
+data (Phase 5, Section 11) instead.
+
 Outputs: `results/rosma_report.json` (all four checks), `results/rosma_mastery_trend.png`
 (predicted P(late) by repetition, held-out users), `results/rosma_reliability_diagram.png`.
 
 ## 11. Remaining next steps
 
-- **RQ1 is still open** (Section 10) — the natural next step is more ROSMA
-  users' worth of signal, which doesn't exist in this dataset (only 12
-  users total), so this really means: (a) discuss with supervisor whether
-  the per-user-normalization lead (Check 4) is worth a small dedicated
-  write-up as a documented open question, or (b) fall back to
-  self-collected pilot data (below) for a domain-matched, if n=1, check.
-- **Self-collected pilot data** (own RJ45/cable-termination attempts via a
-  phone IMU logging app) is now the most direct remaining path to a
-  domain-matched motor-skill check, since both JIGSAWS (rejected) and ROSMA
-  (tested, genuinely mixed result) are exhausted as *public* options. Zero
-  external dependency (no approval, no outage risk).
-- **Discuss with supervisor**: Section 4's finding sharpens the open question
-  already on record — B4 ignoring the real, pooled uncertainty signal now
-  costs even more accuracy once real BKT parameters are also plugged in.
-  Should the mastery-conditioned utility function (§9.5) incorporate
-  calibrated uncertainty as an input rather than a gate/ignored signal? The
-  reverted "hard override" experiment (destroys E2's shape) still stands as
-  a documented dead end — a *soft*, weighted incorporation (rather than a
-  hard override) is the natural thing to try next, but is a design decision
-  worth making with your supervisor rather than silently re-attempting.
+- **RQ1's ROSMA-specific thread is resolved (Section 10)**: documented as an
+  open question, not chased further (no more held-out users to extract
+  signal from). **Self-collected pilot data** (own network-cabling practice
+  attempts — punch-down on a tool-less/reusable keystone jack, via a phone
+  IMU logging app) is now the active remaining path to a domain-matched
+  motor-skill check, since JIGSAWS (rejected) and ROSMA (tested, resolved)
+  are both exhausted as *public* options. Zero external dependency (no
+  approval, no outage risk); blocked only on acquiring the keystone jack/
+  cable, not on any open design decision.
+- **The uncertainty-as-utility-input question is resolved (Section 4)**: a
+  mastery-gated weighted term is implemented in `policies.py`
+  (`UNCERTAINTY_WEIGHT`), improves but does not close the E1 accuracy gap,
+  and the reason why is now understood mechanistically (see Section 4) —
+  not an open design question anymore, though the residual E1 overshoot
+  itself remains an honestly-reported limitation.
 - **Riiid! Answer Correctness** (Kaggle) remains an option for a second,
   much larger, real learning-log dataset to cross-check the ASSISTments BKT
   fit against, if you want a robustness check on Section 9's numbers.
+- **EPIC-Skills2018** was investigated as a non-hardware alternative and
+  deprioritized for now (pairwise, not absolute/early-late labels; would
+  reuse someone else's pre-extracted deep-CNN features rather than this
+  project's own from-scratch pipeline; none of its 7 tasks are in the
+  network-engineering domain) — not deleted as an option, just not active.
