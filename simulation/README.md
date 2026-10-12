@@ -582,7 +582,12 @@ Outputs: `results/rosma_report.json` (all four checks), `results/rosma_mastery_t
   motor-skill check, since JIGSAWS (rejected) and ROSMA (tested, resolved)
   are both exhausted as *public* options. Zero external dependency (no
   approval, no outage risk); blocked only on acquiring the keystone jack/
-  cable, not on any open design decision.
+  cable, not on any open design decision. **The loader code side of this is
+  now done** (`src/self_collected_data.py`, 2026-10-12): feature extraction
+  and the early/late labelling convention are written and verified against
+  a synthetic parsing-only fixture (never committed, never reported as a
+  real result). The only remaining step is physical — recording the actual
+  sessions — which cannot be done from inside this codebase.
 - **The uncertainty-as-utility-input question is resolved (Section 4)**: a
   mastery-gated weighted term is implemented in `policies.py`
   (`UNCERTAINTY_WEIGHT`), improves but does not close the E1 accuracy gap,

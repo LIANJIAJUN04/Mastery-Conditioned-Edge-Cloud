@@ -301,10 +301,25 @@ now exhausted; what's left, in priority order:
      secondary/optional task (materials are cheap, but punch-down has no
      downside here); **fibre prep still deprioritized** (needs a fusion
      splicer/cleaver — not realistic for a solo pilot).
-   - Still open: actually record the sessions, then write
-     `src/self_collected_data.py` (naming to match `rosma_data.py` /
-     `pamap2_data.py` convention) once real files exist. Given n=1, this
-     feeds the same early/late RQ1-style check Phase 4 did on ROSMA, not
+   - **`src/self_collected_data.py` written and ready (2026-10-12)** —
+     loader + feature extraction (24 features/session: mean/std/min/max of
+     accel x/y/z + gyro x/y/z, deliberately smaller than ROSMA's 616 given
+     this pilot will only have ~6-8 trials) + the same generalised
+     early/late mastery-label convention Phase 4 used on ROSMA, naming
+     matched to `rosma_data.py`/`pamap2_data.py`. Parsing logic verified
+     ad hoc against a clearly-labelled SYNTHETIC fixture built in a temp
+     directory outside the repo (not committed, never treated as real
+     data — see Week 9's research-integrity note on this exact risk).
+     **Still open: actually record the sessions** — this is now the ONLY
+     remaining blocker, and it is a physical one (acquire the keystone
+     jack/cable, record with Sensor Logger), not a code task. Once real
+     folders + `sessions.csv` rows exist under
+     `simulation/data/self_collected/`, `load_self_collected()` should run
+     against them with no further code changes needed; if Sensor Logger's
+     real CSV export columns differ from the `x`/`y`/`z` assumption
+     documented in that file's docstring, `_read_sensor_csv` is the only
+     place that would need adjusting. Given n≈6-8, this feeds the same
+     early/late RQ1-style check Phase 4 did on ROSMA, not
      `run_experiment.py`'s E1/E2/E3 simulation.
 2. ~~Follow up on ROSMA's person-identity-confound lead~~ — **RESOLVED
    2026-09-27.** Ajay delegated this decision back to the student rather
