@@ -574,20 +574,17 @@ Outputs: `results/rosma_report.json` (all four checks), `results/rosma_mastery_t
 
 ## 11. Remaining next steps
 
-- **RQ1's ROSMA-specific thread is resolved (Section 10)**: documented as an
-  open question, not chased further (no more held-out users to extract
-  signal from). **Self-collected pilot data** (own network-cabling practice
-  attempts — punch-down on a tool-less/reusable keystone jack, via a phone
-  IMU logging app) is now the active remaining path to a domain-matched
-  motor-skill check, since JIGSAWS (rejected) and ROSMA (tested, resolved)
-  are both exhausted as *public* options. Zero external dependency (no
-  approval, no outage risk); blocked only on acquiring the keystone jack/
-  cable, not on any open design decision. **The loader code side of this is
-  now done** (`src/self_collected_data.py`, 2026-10-12): feature extraction
-  and the early/late labelling convention are written and verified against
-  a synthetic parsing-only fixture (never committed, never reported as a
-  real result). The only remaining step is physical — recording the actual
-  sessions — which cannot be done from inside this codebase.
+- **RQ1 is closed out at Phase 4's result for this project (decided
+  2026-10-12).** The self-collected pilot data (Section 11 of CLAUDE.md
+  had the full plan, and `src/self_collected_data.py` was written and
+  parsing-verified ahead of time) was deliberately descoped: the physical
+  workflow (buy hardware, learn punch-down, record 6-8 sessions, export,
+  organise, label) was judged not worth the marginal value over Phase 4's
+  already-honest, already-documented open/mixed RQ1 answer. This is a
+  scope decision, not an abandoned task — the loader code and the
+  header-only `sessions.csv` template are both kept in the repo in case a
+  future continuation of this project wants to pick the pilot back up;
+  nothing needs rewriting to do so.
 - **The uncertainty-as-utility-input question is resolved (Section 4)**: a
   mastery-gated weighted term is implemented in `policies.py`
   (`UNCERTAINTY_WEIGHT`), improves but does not close the E1 accuracy gap,

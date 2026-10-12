@@ -22,7 +22,7 @@ falsifiable predictions. **E2 (an inverted-U shaped offload-rate curve across
 the acquisition curve) is explicitly called "the paper"** — the single most
 important thing to reproduce/test.
 
-## Current status: Phase 1, 2a/2b, 2c (PAMAP2), Phase 3 (ASSISTments BKT fit), and Phase 4 (ROSMA, RQ1 test) DONE — 4 real datasets now used
+## Current status: Phase 1, 2a/2b, 2c (PAMAP2), Phase 3 (ASSISTments BKT fit), and Phase 4 (ROSMA, RQ1 test) DONE — 4 real datasets now used. Phase 5 (self-collected pilot) deliberately descoped 2026-10-12 (see "Next steps / Phase 5" below) — **this internship's simulation work is considered complete as of this state; remaining effort goes into the final report.**
 
 All work lives in `simulation/`. Full details, how to reproduce every number,
 and file-to-proposal-section mapping are in **`simulation/README.md`** — read
@@ -270,7 +270,28 @@ genuinely mixed, open result — not a confirmation, not a refutation. JIGSAWS
 was rejected. Both of the two top-priority real-data candidates for RQ1 are
 now exhausted; what's left, in priority order:
 
-1. **Self-collected pilot data** — record own RJ45/cable-termination
+1. ~~Self-collected pilot data~~ — **DECIDED NOT TO PURSUE (2026-10-12).**
+   The app/export/storage decisions and the loader code (below) were fully
+   resolved and written, but the user judged the full physical workflow
+   (buy hardware → learn punch-down technique → record 6-8 sessions →
+   export → organise folders → fill `sessions.csv`) too time-consuming
+   relative to the marginal research value, given Phase 4 (ROSMA) already
+   produced a genuine, honestly-reported answer to RQ1 (open/mixed, not a
+   confirmation or a refutation, with a specific person-identity-confound
+   lead documented — see Phase 4 above and `simulation/README.md`
+   Section 10). Two alternatives were offered (stop here and report RQ1 as
+   answered-but-open per Phase 4; or a much lower-friction non-domain-
+   matched substitute task, e.g. a typed-paragraph practice-curve pilot
+   needing no purchase or new skill) — the user chose to stop here. RQ1
+   therefore stays at Phase 4's result for this project; the self-collected
+   pilot is documented as a deliberately-descoped future-work item, not a
+   silently-abandoned one. `simulation/data/self_collected/sessions.csv`
+   remains the header-only template and `src/self_collected_data.py`
+   remains written-but-unused — both kept as-is (not deleted) in case a
+   future continuation of this project wants to pick this back up.
+
+   Original plan (for that future continuation), preserved below: record own
+   RJ45/cable-termination
    practice attempts using a phone IMU logging app, label each attempt with
    completion time / error count as a mastery proxy (same style as ROSMA's
    Time/Errors/Score). Zero external dependency (no approval, no outage
