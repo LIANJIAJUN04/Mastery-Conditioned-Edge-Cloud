@@ -3,7 +3,7 @@
 ## What this project is
 
 `mastery-conditioned-edge-cloud-proposal.pdf` (root folder) is the supervisor
-(Ajay)'s research proposal: an edge–cloud AI system for wearable skill
+(Dr. Subarmaniam A/L Kannan)'s research proposal: an edge–cloud AI system for wearable skill
 training in network-engineering education (RJ45 termination, fibre prep,
 patch-panel punch-down). Its core argument: routing decisions (which model
 size to run — tiny/small/medium/cloud) should depend on the learner's
@@ -257,7 +257,7 @@ repopulated from scratch.
   reports for the supervisor, written in English, covering the work above
   in report form.
 - `Weekly Report/Supervisor_Discussion_Notes_Phase4.md` — NOT a status
-  report; talking points for a live discussion with Ajay on the two open
+  report; talking points for a live discussion with Dr. Kannan on the two open
   design questions Phase 4 raised (ROSMA's person-identity-confound lead,
   and whether the mastery-conditioned utility function should incorporate
   calibrated uncertainty as a weighted input rather than only a gate). Read
@@ -343,7 +343,7 @@ now exhausted; what's left, in priority order:
      early/late RQ1-style check Phase 4 did on ROSMA, not
      `run_experiment.py`'s E1/E2/E3 simulation.
 2. ~~Follow up on ROSMA's person-identity-confound lead~~ — **RESOLVED
-   2026-09-27.** Ajay delegated this decision back to the student rather
+   2026-09-27.** Dr. Kannan delegated this decision back to the student rather
    than deciding it himself. Resolution: documented as an open question,
    not chased further (option 1 from `Supervisor_Discussion_Notes_Phase4.md`,
    combined with option 3's framing — the null result itself supports
@@ -376,7 +376,7 @@ now exhausted; what's left, in priority order:
    than a required next step now.
 6. ~~Discuss with supervisor: how should calibrated uncertainty factor into
    the mastery-conditioned utility function?~~ — **RESOLVED 2026-09-27.**
-   Ajay delegated this decision back to the student too. Resolution:
+   Dr. Kannan delegated this decision back to the student too. Resolution:
    implemented option 2 from `Supervisor_Discussion_Notes_Phase4.md` (Q2) —
    a mastery-gated *weighted* uncertainty term in
    `src/policies.py::policy_mastery_conditioned`

@@ -1,6 +1,9 @@
 # Weekly reports (kept local only)
 Weekly Report/
 
+# Final report drafts (kept local only, not pushed to the repo)
+Report/
+
 # Python virtual environment
 simulation/venv/
 
