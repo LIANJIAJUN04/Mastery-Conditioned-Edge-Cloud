@@ -253,8 +253,9 @@ repopulated from scratch.
 
 ### Also done
 - `Weekly Report/Week6_Report.md`, `Weekly Report/Week7_Report.md`,
-  `Weekly Report/Week8_Report.md` — weekly reports for the supervisor,
-  written in English, covering the work above in report form.
+  `Weekly Report/Week8_Report.md`, `Weekly Report/Week9_Report.md` — weekly
+  reports for the supervisor, written in English, covering the work above
+  in report form.
 - `Weekly Report/Supervisor_Discussion_Notes_Phase4.md` — NOT a status
   report; talking points for a live discussion with Ajay on the two open
   design questions Phase 4 raised (ROSMA's person-identity-confound lead,
