@@ -3,9 +3,9 @@
 A simulation-based study of edge–cloud AI model selection for wearable
 skill training in network-engineering education.
 
-*First Author*: Dr. Subarmaniam A/L Kannan  
-*Second Author*: Lian Jia Jun (243UT246W5)  
-*Institution*: Faculty of Information Science and Technology (FIST), Multimedia University (MMU), Melaka Campus
+**First Author:** Dr. Subarmaniam A/L Kannan  
+**Second Author:** Lian Jia Jun (243UT246W5)  
+**Institution:** Faculty of Information Science and Technology (FIST), Multimedia University (MMU), Melaka Campus
 
 ---
 
